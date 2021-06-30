@@ -37,3 +37,12 @@ Another Example::
         ${read} =    Read Until
         Should Be Equal As Strings    ${read}    ${EMPTY}
         [Teardown]    Delete All Ports
+
+Install::
+
+	python setup.py install
+	
+Create Windows Installer::
+
+	python setup.py bdist --format=msi
+	
