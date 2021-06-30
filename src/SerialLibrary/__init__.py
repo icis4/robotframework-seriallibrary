@@ -1,6 +1,7 @@
 # coding: utf-8
 from __future__ import unicode_literals
 import codecs
+import time
 import re
 from collections import OrderedDict
 from os import SEEK_CUR
@@ -30,7 +31,7 @@ join = ospath.join
 # unicode type hack
 unicode_ = type('')
 
-    
+
 # add hexlify to codecs
 def hexlify_decode_plus(data, errors='strict'):
     udata, length = hexlify_codec.hex_decode(data, errors)
@@ -524,11 +525,51 @@ class SerialLibrary:
         """
         if size is not None:
             size = float(size)
-        if terminator != LF:
+        if terminator != LF and not isinstance(terminator, (bytes, bytearray)):
             terminator = self._encode(terminator)
         return self._decode(
             self._port(port_locator).read_until(terminator=terminator, size=size),
             encoding)
+
+    def read_until_pattern(self, pattern, terminator=LF, size=None, encoding=None, port_locator=None):
+        """
+        Read until a (multiline) pattern is found, size exceeded or timeout.
+
+        If `encoding` is not given, default encoding is used.
+        Note that encoding affects terminator too, so if you want to use
+        character 'X' as terminator and encoding=hexlify (default), you should
+        call this keyword as Read Until terminator=58.
+        """
+        if size is not None:
+            size = float(size)
+        if terminator != LF and not isinstance(terminator, (bytes, bytearray)):
+            terminator = self._encode(terminator)
+        port = self._port(port_locator)
+        regexp = re.compile(pattern, re.MULTILINE)
+        old_timeout = port.timeout
+        port.timeout = 0.1
+        start_time = time.time()
+        buffer = ""
+        bytes_read = 0
+        while True:
+            if size is not None:
+                size -= bytes_read
+                if size < 0.01:
+                    break
+            new_data = self._decode(
+                port.read_until(expected=terminator, size=size),
+                encoding
+            )
+            buffer += new_data
+            bytes_read = len(new_data)
+            if bytes_read:
+                start_time = time.time()
+
+            regexp_found = bool(regexp.search(buffer))
+            if regexp_found or (time.time() - start_time > old_timeout):
+                break
+        port.timeout = old_timeout
+        return buffer
 
     def port_should_have_unread_bytes(self, port_locator=None):
         """
@@ -759,7 +800,7 @@ class SerialLibrary:
         In former case, path should be absolute or relative to current directory.
         In latter case, file (or file-like object should support read with
         specified length.
-        If offset is non-zero, file is seek()-ed from *current position* 
+        If offset is non-zero, file is seek()-ed from *current position*
         (not the beginning of the file). Note that your the file object should
         support seek() method  with SEEK_CUR.
         If length is negative, all content after current input file position is read.
