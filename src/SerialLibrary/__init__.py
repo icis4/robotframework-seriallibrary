@@ -545,9 +545,9 @@ class SerialLibrary:
         if terminator != LF and not isinstance(terminator, (bytes, bytearray)):
             terminator = self._encode(terminator)
         port = self._port(port_locator)
-        regexp = re.compile(pattern, re.MULTILINE | re.DOTALL | re.VERBOSE)
+        regexp = re.compile(pattern, re.MULTILINE | re.DOTALL)
         old_timeout = port.timeout
-        port.timeout = 0.1
+        port.timeout = 0.3
         start_time = time.time()
         buffer = ""
         bytes_read = 0
@@ -564,7 +564,8 @@ class SerialLibrary:
             bytes_read = len(new_data)
             if bytes_read:
                 start_time = time.time()
-
+            else:
+                time.sleep(0.1)
             regexp_found = bool(regexp.search(buffer))
             if regexp_found or (time.time() - start_time > old_timeout):
                 break
