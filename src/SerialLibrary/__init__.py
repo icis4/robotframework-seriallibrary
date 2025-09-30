@@ -528,7 +528,7 @@ class SerialLibrary:
         if terminator != LF and not isinstance(terminator, (bytes, bytearray)):
             terminator = self._encode(terminator)
         return self._decode(
-            self._port(port_locator).read_until(terminator=terminator, size=size),
+            self._port(port_locator).read_until(expected=terminator, size=size),
             encoding)
 
     def read_until_pattern(self, pattern, terminator=LF, size=None, encoding=None, port_locator=None):
