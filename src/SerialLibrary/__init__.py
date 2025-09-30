@@ -557,7 +557,7 @@ class SerialLibrary:
                 if size < 0.01:
                     break
             new_data = self._decode(
-                port.read_until(expected=terminator, size=size),
+                port.read_until(terminator=terminator, size=size),
                 encoding
             )
             buffer += new_data
