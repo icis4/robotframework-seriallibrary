@@ -561,16 +561,11 @@ class SerialLibrary:
                 if time.time() - start_time > old_timeout:
                     break
                 continue
-            new_data = self._decode(port.read_all(), encoding)
-            # new_data = self._decode(
-            #     port.read_until(expected=terminator, size=size),
-            #     encoding
-            # )
+            new_data = self._decode(port.read(port.in_waiting), encoding)
             buffer += new_data
             bytes_read = len(new_data)
             start_time = time.time()
-            regexp_found = bool(regexp.search(buffer))
-            if regexp_found or (time.time() - start_time > old_timeout):
+            if bool(regexp.search(buffer)): # If the pattern is found
                 break
         port.timeout = old_timeout
         return buffer
