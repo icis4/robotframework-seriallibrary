@@ -556,16 +556,19 @@ class SerialLibrary:
                 size -= bytes_read
                 if size < 0.01:
                     break
-            new_data = self._decode(
-                port.read_until(expected=terminator, size=size),
-                encoding
-            )
+            if port.in_waiting == 0:
+                time.sleep(0.1)
+                if time.time() - start_time > old_timeout:
+                    break
+                continue
+            new_data = self._decode(port.read_all(), encoding)
+            # new_data = self._decode(
+            #     port.read_until(expected=terminator, size=size),
+            #     encoding
+            # )
             buffer += new_data
             bytes_read = len(new_data)
-            if bytes_read:
-                start_time = time.time()
-            else:
-                time.sleep(0.1)
+            start_time = time.time()
             regexp_found = bool(regexp.search(buffer))
             if regexp_found or (time.time() - start_time > old_timeout):
                 break
