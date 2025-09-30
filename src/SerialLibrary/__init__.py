@@ -547,7 +547,7 @@ class SerialLibrary:
         port = self._port(port_locator)
         regexp = re.compile(pattern, re.MULTILINE | re.DOTALL)
         old_timeout = port.timeout
-        port.timeout = 0.3
+        port.timeout = 1.0
         start_time = time.time()
         buffer = ""
         bytes_read = 0
