@@ -46,3 +46,15 @@ Create Windows Installer::
 
 	python setup.py bdist --format=msi
 	
+Melexis Patch
+=============
+
+The Melexis patch introduces the following enhancements to SerialLibrary:
+
+* Added keyword ``Read Until Pattern`` (``Read Until Pattern    <regexp>``) to allow reading incoming serial data until a multiline regular expression is matched, a terminator is reached, a size limit is exceeded, or a timeout occurs.
+* More robust timeout handling while incrementally accumulating serial input when searching for a pattern.
+* Minor doc clarifications and code comments regarding pattern based reading.
+
+Credits: Patch contributed by Melexis.
+
+If you need additional details about the patch motivations or migration notes, please open an issue so they can be documented here.
