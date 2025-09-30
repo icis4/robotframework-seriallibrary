@@ -545,7 +545,7 @@ class SerialLibrary:
         if terminator != LF and not isinstance(terminator, (bytes, bytearray)):
             terminator = self._encode(terminator)
         port = self._port(port_locator)
-        regexp = re.compile(pattern, re.MULTILINE | re.DOTALL)
+        regexp = re.compile(pattern, re.MULTILINE | re.DOTALL | re.VERBOSE)
         old_timeout = port.timeout
         port.timeout = 0.1
         start_time = time.time()
