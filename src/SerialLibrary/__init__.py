@@ -557,7 +557,7 @@ class SerialLibrary:
                 if size < 0.01:
                     break
             if port.in_waiting == 0:
-                time.sleep(0.1)
+                #time.sleep(0.1)
                 if time.time() - start_time > old_timeout:
                     break
                 continue
